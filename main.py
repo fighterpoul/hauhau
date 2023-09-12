@@ -5,7 +5,7 @@ import numpy as np
 from object_detection.utils import visualization_utils as viz_utils
 import pathlib
 import tabulate
-
+import decorators
 import alarm
 alarm.load(pathlib.Path('alarm.mp3'))
 
@@ -69,35 +69,18 @@ try:
         detected_elements = set(detected_elements[:, 0])
 
         # Visualize and annotate the detected objects
-        image_np_with_detections = cv2.cvtColor(
-            image_np.copy(), cv2.COLOR_BGR2RGB)
-        viz_utils.visualize_boxes_and_labels_on_image_array(
-            image_np_with_detections,
-            detections['detection_boxes'][0].numpy(),
-            detections['detection_classes'][0].numpy().astype(np.int32),
-            detections['detection_scores'][0].numpy(),
-            labels_map,
-            use_normalized_coordinates=True,
-            max_boxes_to_draw=200,
-            min_score_thresh=CONFIDENCE_THRESH
-        )
-
-        # Prepare for displaying
-        image_np_with_detections = cv2.cvtColor(
-            image_np_with_detections, cv2.COLOR_RGB2BGR)
-        timestamp = datetime.datetime.now().strftime("%d.%m %H:%M:%S")
-        cv2.putText(image_np_with_detections, timestamp, (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, WHITE_COLOR, 2)
+        decorated_frame = decorators.decorate_by_detections(image_np,detections,labels_map,CONFIDENCE_THRESH)
+        decorators.decorate_by_timestamp(decorated_frame)
 
         # Display the annotated image
         if detector.is_detected(detections=detected_elements, musts=['cell phone']):
             print('Cat is in da hause!')
-            OUTPUT_VIDEO.write(image_np_with_detections)
+            OUTPUT_VIDEO.write(decorated_frame)
             alarm.play_if_not_playing()
         else:
             alarm.stop()
 
-        cv2.imshow("Video Stream", image_np_with_detections)
+        cv2.imshow("Video Stream", decorated_frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 finally:
