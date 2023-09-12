@@ -1,11 +1,10 @@
 import detector
 import cv2
-import datetime
 import numpy as np
-from object_detection.utils import visualization_utils as viz_utils
 import pathlib
 import tabulate
 import decorators
+import video
 import alarm
 alarm.load(pathlib.Path('alarm.mp3'))
 
@@ -19,11 +18,8 @@ labels_map = detector.get_labels_map()
 CONFIDENCE_THRESH = 0.3
 WIDTH = 1024
 HEIGHT = 576
-OUTPUT_VIDEO_PATH = pathlib.Path('video.mp4')
-FOURCC = cv2.VideoWriter_fourcc(*'mp4v')
-OUTPUT_VIDEO = cv2.VideoWriter(
-    str(OUTPUT_VIDEO_PATH), FOURCC, 1.5, (WIDTH, HEIGHT))
 WHITE_COLOR = (255, 255, 255)
+video.init(width=WIDTH, height=HEIGHT, fps=1.5)
 
 # Initialize the camera (usually 0 for the default camera, but it can be different)
 
@@ -75,7 +71,7 @@ try:
         # Display the annotated image
         if detector.is_detected(detections=detected_elements, musts=['cell phone']):
             print('Cat is in da hause!')
-            OUTPUT_VIDEO.write(decorated_frame)
+            video.write(decorated_frame)
             alarm.play_if_not_playing()
         else:
             alarm.stop()
@@ -86,4 +82,4 @@ try:
 finally:
     cap.release()
     cv2.destroyAllWindows()
-    OUTPUT_VIDEO.release()
+    video.release()
