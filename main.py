@@ -6,10 +6,8 @@ from object_detection.utils import visualization_utils as viz_utils
 import pathlib
 import tabulate
 
-import pygame
-pygame.mixer.init()
-ALARM_AUDIO_FILE_PATH = pathlib.Path('alarm.mp3')
-pygame.mixer.music.load(ALARM_AUDIO_FILE_PATH)
+import alarm
+alarm.load(pathlib.Path('alarm.mp3'))
 
 
 # Load the model
@@ -95,10 +93,9 @@ try:
         if detector.is_detected(detections=detected_elements, musts=['cell phone']):
             print('Cat is in da hause!')
             OUTPUT_VIDEO.write(image_np_with_detections)
-            if not pygame.mixer.music.get_busy():
-                pygame.mixer.music.play()
+            alarm.play_if_not_playing()
         else:
-            pygame.mixer.music.stop()
+            alarm.stop()
 
         cv2.imshow("Video Stream", image_np_with_detections)
         if cv2.waitKey(1) & 0xFF == ord('q'):
