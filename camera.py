@@ -1,4 +1,5 @@
 import cv2
+from typing import Iterator
 
 try:
     from picamera import PiCamera
@@ -12,7 +13,8 @@ try:
             self.camera = None
 
         def __enter__(self):
-            self.camera = PiCamera(resolution=self.resolution, framerate=self.framerate)
+            self.camera = PiCamera(
+                resolution=self.resolution, framerate=self.framerate)
             self.camera.start_preview()
             time.sleep(2)  # Allow the camera to warm up
             return self
@@ -28,7 +30,8 @@ try:
 
         def __next__(self):
             if self.camera is None:
-                raise ValueError("CameraFrameIterator is not inside a 'with' block")
+                raise ValueError(
+                    "CameraFrameIterator is not inside a 'with' block")
 
             with picamera.array.PiRGBArray(self.camera) as output:
                 self.camera.capture(output, 'rgb')
@@ -39,12 +42,17 @@ except:
 
 
 class CVCameraFrameIterator:
-    def __init__(self, camera_id=0):
+    def __init__(self, width: int, height: int, camera_id=0):
+        cv2.CAP_GSTREAMER
         self.camera_id = camera_id
+        self.width = width
+        self.height = height
         self.capture = None
 
     def __enter__(self):
         self.capture = cv2.VideoCapture(self.camera_id)
+        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -56,9 +64,18 @@ class CVCameraFrameIterator:
         return self
 
     def __next__(self):
+        if not self.capture.isOpened():
+            raise StopIteration
+
         ret, frame = self.capture.read()
+
         if not ret:
             raise StopIteration
         if cv2.waitKey(1) & 0xFF == ord('q'):
             raise StopIteration
+
         return frame
+
+
+def create(width: int, height: int, camera_id=0) -> Iterator:
+    return CVCameraFrameIterator(width=width, height=height, camera_id=camera_id)
