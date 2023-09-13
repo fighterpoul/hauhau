@@ -13,3 +13,6 @@ pip install .
 
 sudo apt install v4l-utils
 $ v4l2-ctl -d /dev/video0 --list-formats-ext
+
+ffmpeg -re -framerate 1 -loop 1 -i frame.jpg -vf "format=yuv420p" -f mpegts -r 1 udp://localhost:1234
+ffplay udp://localhost:1234

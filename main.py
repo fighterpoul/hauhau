@@ -5,8 +5,14 @@ import pathlib
 import tabulate
 import decorators
 import video
+import presenter
+import image
 import alarm
-alarm.load(pathlib.Path('alarm.mp3'))
+
+CONFIDENCE_THRESH = 0.3
+WIDTH = 1024
+HEIGHT = 576
+WHITE_COLOR = (255, 255, 255)
 
 
 # Load the model
@@ -14,12 +20,9 @@ detector.load_model(model_path=pathlib.Path('efficientdet_d4_coco17_tpu-32/saved
                     labels_path=pathlib.Path('efficientdet_d4_coco17_tpu-32/coco-labels-paper.txt'))
 labels_map = detector.get_labels_map()
 
-
-CONFIDENCE_THRESH = 0.3
-WIDTH = 1024
-HEIGHT = 576
-WHITE_COLOR = (255, 255, 255)
 video.init(width=WIDTH, height=HEIGHT, fps=1.5)
+image.init()
+alarm.load(pathlib.Path('alarm.mp3'))
 
 # Initialize the camera (usually 0 for the default camera, but it can be different)
 
@@ -39,9 +42,8 @@ if not cap.isOpened():
     print("Error: Could not open camera.")
     exit()
 
-cv2.namedWindow("Video Stream", cv2.WINDOW_NORMAL)
-
 try:
+    presenter.init()
     while True:
         # Capture a frame
         print('Capturing a frame...')
@@ -76,10 +78,11 @@ try:
         else:
             alarm.stop()
 
-        cv2.imshow("Video Stream", decorated_frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        presenter.update(decorated_frame)
+        image.update(decorated_frame)
+except StopIteration:
+    pass
 finally:
     cap.release()
-    cv2.destroyAllWindows()
+    presenter.release()
     video.release()
