@@ -1,0 +1,7 @@
+numpy
+Pillow
+pygame
+opencv-python
+opencv-contrib-python
+tensorflow
+tabulate
