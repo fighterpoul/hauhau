@@ -1,8 +1,28 @@
+# `hauhau` - The "No More Table Cat" Alert
+
+## What's hauhau?
+**hauhau** is an echoism for barking sound in Polish. But thanks to this package it's a way more!
+`hauhau` is your feline-enforcement companion! It's a snazzy Python tool that uses TensorFlow magic to keep your kitty off the kitchen table. When our furry friends break the rules, hauhau barks (well, not literally) and sends them running!
+`hauhau` is proven working on Linux and Raspberry Pi (`picamera`).
+
+## Quick Setup
+
+1. Install Python >=3.9 if you haven't already.
+
+2. Get TensorFlow models and file with class labels.
+
+3. Get `hauhau` with this simple command:
+
+    ```bash
+    pip install hauhau
+    ```
+
+
 git clone https://github.com/tensorflow/models.git
 
 cd models/research/
 
-sudo apt  install protobuf-compiler
+sudo apt install protobuf-compiler
 
 protoc object_detection/protos/*.proto --python_out=.
 
@@ -16,3 +36,7 @@ $ v4l2-ctl -d /dev/video0 --list-formats-ext
 
 ffmpeg -re -framerate 1 -loop 1 -i frame.jpg -vf "format=yuv420p" -f mpegts -r 1 udp://localhost:1234
 ffplay udp://localhost:1234
+
+## Customization - More Than Just Cat Control!
+
+`hauhau` is super flexible! While it's perfect for cat-wrangling, you can customize it for all sorts of scenarios. For instance, keep an eye on your kids eating sweets while you're not around. Want to know if someone's raiding the cookie jar? `hauhau`'s got your back!

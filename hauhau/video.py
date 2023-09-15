@@ -3,15 +3,16 @@ import datetime
 import cv2
 import numpy as np
 
-_videos_folder_path = pathlib.Path('.')
+_videos_folder_path = None
 
 _writer = None
 _width = None
 _height = None
 _fps = None
 
-def init(width: int, height: int, fps: float):
-    global _writer, _width, _height, _fps
+def init(videos_folder_path: pathlib.Path, width: int, height: int, fps: float):
+    global _writer, _width, _height, _fps, _videos_folder_path
+    _videos_folder_path = videos_folder_path
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     _writer = cv2.VideoWriter(
         str(get_supposed_filepath()), fourcc, fps, (width, height))
@@ -34,6 +35,6 @@ def release():
     _writer.release()
 
 def _recreate():
-    global _width, _height, _fps
+    global _width, _height, _fps, _videos_folder_path
     release()
-    init(width=_width, height=_height, fps=_fps)
+    init(videos_folder_path=_videos_folder_path, width=_width, height=_height, fps=_fps)
