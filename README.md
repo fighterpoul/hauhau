@@ -42,6 +42,59 @@ python -m hauhau \
 `hauhau` is super flexible! While it's perfect for cat-wrangling, you can customize it for all sorts of scenarios. For instance, keep an eye on your kids eating sweets while you're not around. Want to know if someone's raiding the cookie jar? `hauhau`'s got your back!
 
 ## Advanced
+
+```bash
+>_ python -m hauhau --help
+
+usage: hauhau [-h] --tf-model TF_MODEL --model-labels MODEL_LABELS
+              [--confidence-threshold CONFIDENCE_THRESHOLD]
+              [--musts MUSTS [MUSTS ...]] [--must-nots [MUST_NOTS ...]]
+              --frame-width FRAME_WIDTH --frame-height FRAME_HEIGHT
+              [--alarm-sound ALARM_SOUND] [--wall-of-shame WALL_OF_SHAME]
+              [--fps FPS] [--last-frame-path LAST_FRAME_PATH]
+              [--preview | --no-preview]
+              [--log-frame-detections | --no-log-frame-detections]
+
+Get them spotted!
+
+options:
+  -h, --help            show this help message and exit
+  --tf-model TF_MODEL   Path to a directory with a TensorFlow model (*.pb).
+  --model-labels MODEL_LABELS
+                        Path to a text file with class labels. It will be used to
+                        map class IDs returned by tf-model to human-readable
+                        labels.
+  --confidence-threshold CONFIDENCE_THRESHOLD
+                        How confident the model must be about detected musts and
+                        must_nots to consider them as visible on camera.
+  --musts MUSTS [MUSTS ...]
+                        Objects that must be visible on camera for alarm to be
+                        raised. "Cat" by default.
+  --must-nots [MUST_NOTS ...]
+                        Objects that must NOT be visible on camera for alarm to be
+                        raised. "Person" by default.
+  --frame-width FRAME_WIDTH
+                        Width of a frame captured by camera
+  --frame-height FRAME_HEIGHT
+                        Height of a frame captured by camera
+  --alarm-sound ALARM_SOUND
+                        Path to an alarm audio file.
+  --wall-of-shame WALL_OF_SHAME
+                        Optional. Path to a directory where video recordings will
+                        be published. If furry gets spotted, here are your proofs.
+  --fps FPS             Fps of videos published on wall of shame, thus required if
+                        wall of shame is provided. Depends on host's performance,
+                        usually something around 1fps.
+  --last-frame-path LAST_FRAME_PATH
+                        Optional. Path to a file that will be continuously updated
+                        by last frame with detections. Can be used i.e. to
+                        webstream by using ffmpeg.
+  --preview, --no-preview
+                        Will display window with camera preview
+  --log-frame-detections, --no-log-frame-detections
+                        Will log detected objects.
+```
+
 TODO
 ```bash
 sudo apt install v4l-utils
@@ -50,3 +103,6 @@ $ v4l2-ctl -d /dev/video0 --list-formats-ext
 ffmpeg -re -framerate 1 -loop 1 -i frame.jpg -vf "format=yuv420p" -f mpegts -r 1 udp://localhost:1234
 ffplay udp://localhost:1234
 ```
+
+## Kudos
+All default sounds downloaded from pixabay.com - awesome place with Royalty-free assets.

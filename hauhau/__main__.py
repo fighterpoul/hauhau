@@ -1,5 +1,6 @@
 import argparse
 import pathlib
+from hauhau.alarm import AUDIO_FILES_DIR
 
 
 def _exiting_directory(value) -> pathlib.Path:
@@ -53,7 +54,8 @@ def _percent(value) -> float:
 
 def main():
 
-    parser = argparse.ArgumentParser(description='Get them spotted!', prog="hauhau")
+    parser = argparse.ArgumentParser(
+        description='Get them spotted!', prog="hauhau")
     parser.add_argument('--tf-model', type=_exiting_directory,
                         help='Path to a directory with a TensorFlow model (*.pb).', required=True)
     parser.add_argument('--model-labels', type=_exiting_file,
@@ -62,21 +64,21 @@ def main():
                         help='How confident the model must be about detected musts and must_nots to consider them as visible on camera.')
 
     parser.add_argument('--musts', type=str, nargs='+', default='cat',
-                        help='')
-    parser.add_argument('--must-nots', type=str, nargs='?', const='', default='person',
-                        help='')
+                        help='Objects that must be visible on camera for alarm to be raised. "Cat" by default.')
+    parser.add_argument('--must-nots', type=str, nargs='*', default='person',
+                        help='Objects that must NOT be visible on camera for alarm to be raised. "Person" by default.')
 
     parser.add_argument('--frame-width', type=_positive_int,
-                        help='', required=True)
+                        help='Width of a frame captured by camera', required=True)
     parser.add_argument('--frame-height', type=_positive_int,
-                        help='', required=True)
-    parser.add_argument('--fps', type=_positive_float,
-                        help='', required=True)
+                        help='Height of a frame captured by camera', required=True)
 
     parser.add_argument('--alarm-sound', type=_exiting_file,
-                        help='Path to an alarm audio file.', required=True)
+                        help='Path to an alarm audio file.', default=AUDIO_FILES_DIR.joinpath('barking.mp3'))
     parser.add_argument('--wall-of-shame', type=_exiting_directory,
-                        help='Optional. Path to a directory where video recordings will be published.')
+                        help='Optional. Path to a directory where video recordings will be published. If furry gets spotted, here are your proofs.')
+    parser.add_argument('--fps', type=_positive_float, default=1,
+                        help='Fps of videos published on wall of shame, thus required if wall of shame is provided. Depends on host\'s performance, usually something around 1fps.')
     parser.add_argument('--last-frame-path', type=pathlib.Path,
                         help='Optional. Path to a file that will be continuously updated by last frame with detections. Can be used i.e. to webstream by using ffmpeg.')
 
@@ -92,8 +94,8 @@ def main():
         model_path=args.tf_model,
         labels_path=args.model_labels,
         confidence_thresh=args.confidence_threshold,
-        musts=args.musts,
-        must_nots=args.must_nots,
+        musts=set(args.musts),
+        must_nots=set(args.must_nots),
         frame_width=args.frame_width,
         frame_height=args.frame_height,
         fps=args.fps,

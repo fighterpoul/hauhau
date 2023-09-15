@@ -4,6 +4,7 @@ import os
 import pathlib
 import tabulate
 from typing import Optional, Set
+import time
 import logging
 
 logger = logging.getLogger('hauhau-detections')
@@ -14,7 +15,7 @@ def _init_modules(model_path: pathlib.Path,
                   frame_width: int, frame_height: int, fps: float,
                   videos_folder_path: Optional[pathlib.Path],
                   frame_image_path: Optional[pathlib.Path],
-                  audio_alarm_path: Optional[pathlib.Path],
+                  audio_alarm_path: pathlib.Path,
                   log_frame_detections: bool):
     detector.load_model(model_path=model_path,
                         labels_path=labels_path)
@@ -26,8 +27,7 @@ def _init_modules(model_path: pathlib.Path,
     if frame_image_path:
         image.init(image_path=frame_image_path)
 
-    if audio_alarm_path:
-        alarm.load(audio_alarm_path)
+    alarm.init(audio_alarm_path)
 
     logger.setLevel(logging.INFO if log_frame_detections else logging.CRITICAL)
 
@@ -76,5 +76,7 @@ def main(model_path: pathlib.Path,
             except KeyboardInterrupt:
                 break
 
+    alarm.release()
     presenter.release()
     video.release()
+    time.sleep(2)
