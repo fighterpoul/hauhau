@@ -36,7 +36,7 @@ def main(model_path: pathlib.Path,
          labels_path: pathlib.Path,
          confidence_thresh: float,
          musts: Set[str], must_nots: Set[str],
-         frame_width: int, frame_height: int, fps: float,
+         frame_width: int, frame_height: int, camera_id: any, fps: float,
          videos_folder_path: Optional[pathlib.Path],
          frame_image_path: Optional[pathlib.Path],
          audio_alarm_path: Optional[pathlib.Path],
@@ -50,7 +50,7 @@ def main(model_path: pathlib.Path,
 
     labels_map = detector.get_labels_map()
 
-    with camera.create(width=frame_width, height=frame_height) as camera_iterator:
+    with camera.create(width=frame_width, height=frame_height, camera_id=camera_id) as camera_iterator:
         presenter.init(preview)
         for frame in camera_iterator:
             try:

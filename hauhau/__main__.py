@@ -72,6 +72,8 @@ def main():
                         help='Width of a frame captured by camera', required=True)
     parser.add_argument('--frame-height', type=_positive_int,
                         help='Height of a frame captured by camera', required=True)
+    parser.add_argument('--camera-id', default=0,
+                        help='Camera Id. You can provide everything acceptable for cv2.VideoCapture.')
 
     parser.add_argument('--alarm-sound', type=_exiting_file,
                         help='Path to an alarm audio file.', default=AUDIO_FILES_DIR.joinpath('barking.mp3'))
@@ -98,6 +100,7 @@ def main():
         must_nots=set(args.must_nots),
         frame_width=args.frame_width,
         frame_height=args.frame_height,
+        camera_id=args.camera_id,
         fps=args.fps,
         videos_folder_path=args.wall_of_shame,
         frame_image_path=args.last_frame_path,

@@ -1,5 +1,8 @@
 import cv2
 from typing import Iterator
+import logging
+
+logger = logging.getLogger('hauhau')
 
 try:
     from picamera import PiCamera
@@ -37,8 +40,8 @@ try:
                 self.camera.capture(output, 'rgb')
                 frame = output.array
                 return frame
-except:
-    print('Not possible to use picamera')
+except Exception as e:
+    logger.error(f'Not possible to use picamera: {e}')
 
 
 class CVCameraFrameIterator:
@@ -65,13 +68,16 @@ class CVCameraFrameIterator:
 
     def __next__(self):
         if not self.capture.isOpened():
+            logger.error('Video capture is not opened')
             raise StopIteration
 
         ret, frame = self.capture.read()
 
         if not ret:
+            logger.error('Could not capture video frame. Finishing.')
             raise StopIteration
         if cv2.waitKey(1) & 0xFF == ord('q'):
+            logger.info('Bye')
             raise StopIteration
 
         return frame

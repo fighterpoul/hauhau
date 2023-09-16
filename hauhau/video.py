@@ -32,7 +32,8 @@ def write(frame: np.array):
 
 def release():
     global _writer
-    _writer.release()
+    if _writer:
+        _writer.release()
 
 def _recreate():
     global _width, _height, _fps, _videos_folder_path
