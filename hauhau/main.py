@@ -75,6 +75,9 @@ def main(model_path: pathlib.Path,
                 image.update(decorated_frame)
             except KeyboardInterrupt:
                 break
+            except IndexError:
+                # no detections
+                presenter.update(frame)
 
     alarm.release()
     presenter.release()

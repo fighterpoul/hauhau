@@ -25,7 +25,7 @@ def detect_objects(image_np: np.array):
     return detections
 
 
-def list_detected_elements(detections, confidence_thresh: float) -> List[Tuple[str, float]]:
+def list_detected_elements(detections, confidence_thresh: float) -> np.array:
     detected_classes = detections['detection_classes'][0].numpy().astype(
         np.int32)
     detected_scores = detections['detection_scores'][0].numpy()
