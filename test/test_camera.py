@@ -1,4 +1,4 @@
+from hauhau import camera
 
 def test_import_works():
-    import camera
-    camera.CVCameraFrameIterator()
+    camera.CVCameraFrameIterator(1024, 576)

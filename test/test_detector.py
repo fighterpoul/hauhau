@@ -1,4 +1,4 @@
-from detector import is_detected
+from hauhau.detector import is_detected
 
 def test_valid_subset():
     detections = ['cat', 'dog', 'cell phone']
