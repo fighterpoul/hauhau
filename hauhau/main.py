@@ -83,7 +83,7 @@ def main(model_path: pathlib.Path,
                 except KeyboardInterrupt:
                     break
     except TimeoutError as e:
-        logger.error(f'Camera could not yield first frame in given timeout: {e}')
+        logger.error(f'Camera <{camera_id}> could not yield first frame in given timeout: {e}')
 
     video.release()
     alarm.release()
