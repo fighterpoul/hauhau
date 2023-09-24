@@ -1,5 +1,5 @@
 import cv2
-from typing import Iterator
+from typing import Iterator, Callable
 import logging
 import threading
 import time
@@ -72,6 +72,27 @@ class LifoQueue():
 
     def is_empty(self) -> bool:
         return self.size() <= 0
+    
+def wait_for_condition(predicate: Callable, timeout: int = 10, error_type=TimeoutError):
+    """
+    Wait for a condition to be True or raise an error if the timeout is exceeded.
+
+    Args:
+        predicate (callable): A function that returns True or False.
+        timeout (float): The maximum time to wait for the condition to return True (in seconds).
+        error_type (Exception, optional): The type of error to raise if the timeout is exceeded.
+            Defaults to RuntimeError.
+
+    Raises:
+        error_type: If the condition is not met within the specified timeout.
+    """
+    start_time = time.time()
+
+    while not predicate():
+        elapsed_time = time.time() - start_time
+        if elapsed_time >= timeout:
+            raise error_type(f"Timeout exceeded ({timeout} seconds)")
+        time.sleep(0.2)
 
 
 class CVCameraFrameIterator:
@@ -99,8 +120,7 @@ class CVCameraFrameIterator:
         self.capture.set(cv2.CAP_PROP_BUFFERSIZE, 5)
 
         self.thread.start()
-        while self.queue.is_empty():
-            time.sleep(0.1)
+        wait_for_condition(lambda: not self.queue.is_empty())
 
         return self
 

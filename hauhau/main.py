@@ -50,37 +50,40 @@ def main(model_path: pathlib.Path,
 
     labels_map = detector.get_labels_map()
 
-    with camera.create(width=frame_width, height=frame_height, camera_id=camera_id) as camera_iterator:
-        presenter.init(preview)
-        for frame in camera_iterator:
-            try:
-                detections = detector.detect_objects(frame)
-                detected_elements = detector.list_detected_elements(
-                    detections, confidence_thresh)
-                
-                if len(detected_elements):
-                    detections_logger.info(os.linesep + tabulate.tabulate(
-                        detected_elements, headers=['Object', 'Confidence']))
-                    detected_elements = set(detected_elements[:, 0])
+    try:
+        with camera.create(width=frame_width, height=frame_height, camera_id=camera_id) as camera_iterator:
+            presenter.init(preview)
+            for frame in camera_iterator:
+                try:
+                    detections = detector.detect_objects(frame)
+                    detected_elements = detector.list_detected_elements(
+                        detections, confidence_thresh)
+                    
+                    if len(detected_elements):
+                        detections_logger.info(os.linesep + tabulate.tabulate(
+                            detected_elements, headers=['Object', 'Confidence']))
+                        detected_elements = set(detected_elements[:, 0])
 
-                    decorated_frame = decorators.decorate_by_detections(
-                        frame, detections, labels_map, confidence_thresh)
-                    decorators.decorate_by_timestamp(decorated_frame)
+                        decorated_frame = decorators.decorate_by_detections(
+                            frame, detections, labels_map, confidence_thresh)
+                        decorators.decorate_by_timestamp(decorated_frame)
 
-                    if detector.is_detected(detections=detected_elements, musts=musts, must_nots=must_nots):
-                        logger.info('All conditions met, object(s) detected!')
-                        video.write(decorated_frame)
-                        alarm.play_if_not_playing()
+                        if detector.is_detected(detections=detected_elements, musts=musts, must_nots=must_nots):
+                            logger.info('All conditions met, object(s) detected!')
+                            video.write(decorated_frame)
+                            alarm.play_if_not_playing()
+                        else:
+                            alarm.stop()
                     else:
-                        alarm.stop()
-                else:
-                    decorated_frame = frame
-                    decorators.decorate_by_timestamp(decorated_frame)
+                        decorated_frame = frame
+                        decorators.decorate_by_timestamp(decorated_frame)
 
-                presenter.update(decorated_frame)
-                image.update(decorated_frame)
-            except KeyboardInterrupt:
-                break
+                    presenter.update(decorated_frame)
+                    image.update(decorated_frame)
+                except KeyboardInterrupt:
+                    break
+    except TimeoutError as e:
+        logger.error(f'Camera could not yield first frame in given timeout: {e}')
 
     video.release()
     alarm.release()
