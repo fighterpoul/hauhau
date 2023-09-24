@@ -22,7 +22,13 @@ def init(videos_folder_path: pathlib.Path, width: int, height: int, fps: float):
 
 def get_supposed_filepath() -> pathlib.Path:
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d")
-    return _videos_folder_path.joinpath(f'video-{timestamp}.mp4')
+    video_path = _videos_folder_path.joinpath(f'video-{timestamp}.mp4')
+    counter = 0
+    # because VideoWriter just overrides existing file instead of concatenating frames
+    while video_path.is_file():
+        video_path = _videos_folder_path.joinpath(f'video-{timestamp}-{counter}.mp4')
+        counter += 1
+    return video_path
 
 def write(frame: np.array):
     global _writer
