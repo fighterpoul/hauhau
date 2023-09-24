@@ -6,7 +6,6 @@ import time
 from queue import Queue
 
 logger = logging.getLogger('hauhau')
-logger.setLevel(logging.INFO)
 
 try:
     from picamera import PiCamera

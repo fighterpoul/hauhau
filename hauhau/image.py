@@ -12,5 +12,6 @@ def init(image_path: pathlib.Path):
 
 
 def update(frame: np.array):
+    global _image_path
     if _image_path:
         Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).save(_image_path)

@@ -1,7 +1,7 @@
 import pathlib
 import tensorflow as tf
 import numpy as np
-from typing import List, Set, Tuple
+from typing import Optional, Set
 
 _model = None
 _labels = None
@@ -29,14 +29,19 @@ def list_detected_elements(detections, confidence_thresh: float) -> np.array:
     detected_classes = detections['detection_classes'][0].numpy().astype(
         np.int32)
     detected_scores = detections['detection_scores'][0].numpy()
+    
+    if detected_scores.max() < confidence_thresh:
+        return np.array([])
 
     detection_data = np.array(['', 0])
     for index, class_id in enumerate(detected_classes):
         if class_id < len(_labels) and detected_scores[index] > confidence_thresh:
             detection_data = np.vstack(
                 (detection_data, [_labels[class_id-1], detected_scores[index].astype(float)]))
+            
+    contains_findings = len(detection_data) > 1
 
-    return detection_data
+    return detection_data[1:] if contains_findings else np.array([])
 
 
 def is_detected(detections: Set[str], musts: Set[str], must_nots: Set[str] = set()) -> bool:

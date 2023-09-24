@@ -1,7 +1,11 @@
 import argparse
 import pathlib
+import logging
+
 from hauhau.alarm import AUDIO_FILES_DIR
 
+logger = logging.getLogger('hauhau')
+logger.setLevel(logging.INFO)
 
 def _exiting_directory(value) -> pathlib.Path:
     dir = pathlib.Path(value)

@@ -7,8 +7,8 @@ from typing import Optional, Set
 import time
 import logging
 
-logger = logging.getLogger('hauhau-detections')
-
+detections_logger = logging.getLogger('hauhau-detections')
+logger = logging.getLogger('hauhau')
 
 def _init_modules(model_path: pathlib.Path,
                   labels_path: pathlib.Path,
@@ -29,7 +29,7 @@ def _init_modules(model_path: pathlib.Path,
 
     alarm.init(audio_alarm_path)
 
-    logger.setLevel(logging.INFO if log_frame_detections else logging.CRITICAL)
+    detections_logger.setLevel(logging.INFO if log_frame_detections else logging.CRITICAL)
 
 
 def main(model_path: pathlib.Path,
@@ -57,29 +57,32 @@ def main(model_path: pathlib.Path,
                 detections = detector.detect_objects(frame)
                 detected_elements = detector.list_detected_elements(
                     detections, confidence_thresh)
-                logger.info(os.linesep + tabulate.tabulate(
-                    detected_elements[1:], headers=['Object', 'Confidence']))
-                detected_elements = set(detected_elements[:, 0])
+                
+                if len(detected_elements):
+                    detections_logger.info(os.linesep + tabulate.tabulate(
+                        detected_elements, headers=['Object', 'Confidence']))
+                    detected_elements = set(detected_elements[:, 0])
 
-                decorated_frame = decorators.decorate_by_detections(
-                    frame, detections, labels_map, confidence_thresh)
-                decorators.decorate_by_timestamp(decorated_frame)
+                    decorated_frame = decorators.decorate_by_detections(
+                        frame, detections, labels_map, confidence_thresh)
+                    decorators.decorate_by_timestamp(decorated_frame)
 
-                if detector.is_detected(detections=detected_elements, musts=musts, must_nots=must_nots):
-                    video.write(decorated_frame)
-                    alarm.play_if_not_playing()
+                    if detector.is_detected(detections=detected_elements, musts=musts, must_nots=must_nots):
+                        logger.info('All conditions met, object(s) detected!')
+                        video.write(decorated_frame)
+                        alarm.play_if_not_playing()
+                    else:
+                        alarm.stop()
                 else:
-                    alarm.stop()
+                    decorated_frame = frame
+                    decorators.decorate_by_timestamp(decorated_frame)
 
                 presenter.update(decorated_frame)
                 image.update(decorated_frame)
             except KeyboardInterrupt:
                 break
-            except IndexError:
-                # no detections
-                presenter.update(frame)
 
+    video.release()
     alarm.release()
     presenter.release()
-    video.release()
     time.sleep(2)
