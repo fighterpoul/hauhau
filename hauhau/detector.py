@@ -1,7 +1,7 @@
 import pathlib
 import tensorflow as tf
 import numpy as np
-from typing import Optional, Set
+from typing import Set
 
 _model = None
 _labels = None

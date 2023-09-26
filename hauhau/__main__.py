@@ -67,9 +67,9 @@ def main():
     parser.add_argument('--confidence-threshold', type=_percent, default=0.3,
                         help='How confident the model must be about detected musts and must_nots to consider them as visible on camera.')
 
-    parser.add_argument('--musts', type=str, nargs='+', default='cat',
+    parser.add_argument('--musts', type=str, nargs='+', default=['cat'],
                         help='Objects that must be visible on camera for alarm to be raised. "Cat" by default.')
-    parser.add_argument('--must-nots', type=str, nargs='*', default='person',
+    parser.add_argument('--must-nots', type=str, nargs='*', default=['person'],
                         help='Objects that must NOT be visible on camera for alarm to be raised. "Person" by default.')
 
     parser.add_argument('--frame-width', type=_positive_int,
